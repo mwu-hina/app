@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PSDテンプレ</title>
+    <style>
+      body {
+        /* background-color: rgb(215, 210, 255); */
+        margin: 0;
+        text-align: center;
+      }
+      button {
+        background: transparent; /* 画像の背景を透過 */
+        border: none;
+      }
+      .text {
+        margin-top: 30px;
+      }
+      #FileNamediv {
+        width: 300px;
+        height: 300px;
+        margin: auto;
+      }
+
+      /* メニュー */
+      header {
+        background-color: #175493;
+        color: white;
+        height: 89px;
+        padding: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative; /* 位置を固定するために relative を設定 */
+        z-index: 2; /* メニューより上に表示されるように z-index を設定 */
+      }
+
+      #menu-icon {
+        background: transparent; /* 画像の背景を透過 */
+        border: none;
+      }
+      #back-button {
+        background: transparent; /* 画像の背景を透過 */
+        border: none;
+      }
+
+      #nav-menu {
+        display: none;
+        position: absolute;
+        top: 100%; /* ヘッダーの下にメニューが表示されるように設定 */
+        left: 0;
+        width: 100%;
+        background-color: #ffffff;
+        overflow: hidden;
+        height: 0; /* 初期状態では高さを0にする */
+        transition: height 0.3s ease-out; /* 高さのアニメーション */
+        color: #333;
+      }
+
+      #nav-menu ul {
+        list-style: none;
+
+        background-size: cover;
+        background-repeat: no-repeat;
+        padding: 0;
+        margin: 0;
+      }
+
+      #nav-menu ul li {
+        /* padding: 10px; */
+        height: 55px;
+        /* border-bottom: 1px solid #999; */
+      }
+      #li1 img {
+        width: 100%;
+      }
+      #li2 img,
+      #li3 img {
+        padding: 5px 0;
+        width: 100%;
+      }
+
+      #nav-menu ul li a {
+        color: white;
+        text-decoration: none;
+        display: block;
+      }
+
+      /* メニューが表示されたときの状態 */
+      #nav-menu.show {
+        /* 自動で高さを設定する */
+        height: auto;
+        /* height: 165px; */
+        display: block;
+      }
+      /* 背景を暗くするオーバーレイ */
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* 半透明の黒 */
+        display: none;
+        z-index: 1; /* メニューより下に表示されるように設定 */
+      }
+      .overlay.show {
+        display: block; /* 追加: オーバーレイの表示/非表示を制御 */
+      }
+
+      /* ファイル選択ボタンを隠す */
+      #fileInput {
+        display: none;
+      }
+      #screen3 img {
+        margin-top: 30px;
+        max-width: 212px;
+        max-height: 212px;
+      }
+      .image-container {
+        margin-bottom: 20px;
+      }
+      .options {
+        margin-top: 10px;
+      }
+      .options label {
+        margin-right: 20px;
+      }
+      #screen2,
+      #screen3,
+      #screen4 {
+        display: none; /* 最初は確認画面を隠す */
+      }
+
+      /* 画像とオプションを縦に並べる */
+      .image-container {
+        display: flex;
+        flex-direction: column; /* 縦に並べる */
+        align-items: center; /* 中央揃え */
+        margin-bottom: 20px; /* 各画像コンテナの間隔 */
+      }
+
+      .options {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* 2列に並べる */
+        gap: 10px; /* セル間の隙間 */
+        margin-top: 10px; /* 画像とオプションの間隔 */
+        justify-items: center; /* ラベルをセル内で中央揃え */
+      }
+
+      label {
+        display: flex;
+        align-items: center; /* ラベル内でアイテムを縦中央揃え */
+      }
+
+      /* ラジオボタンの○を消す */
+      input[type="radio"] {
+        display: none;
+      }
+
+      /* ラジオボタンが選択されている場合に画像を変える */
+      .options input[type="radio"]:checked + img.front {
+        content: url("images/front-selected.png"); /* 選択後の画像 */
+      }
+      /* back ラジオボタンが選択された時の画像 */
+      .options input[type="radio"]:checked + img.back {
+        content: url("images/back-selected.png");
+      }
+      /* 袖 ラジオボタンが選択された時の画像 */
+      .options input[type="radio"]:checked + img.sleeve {
+        content: url("images/sleeve-selected.png");
+      }
+
+      /* その他 ラジオボタンが選択された時の画像 */
+      .options input[type="radio"]:checked + img.other {
+        content: url("images/other-selected.png");
+      }
+    </style>
+  </head>
+  <body>
+    <header style="background-image: url('images/header.png')">
+      <!-- <h3>タブメニュー</h3> -->
+      <button id="back-button">
+        <img src="images/backbtn.png" alt="戻る" />
+      </button>
+
+      <!-- インジケーターがでます -->
+      <span id="indicator"></span>
+
+      <div id="menu-icon">
+        <!-- &#9776; -->
+        <img src="images/menuicon.png" alt="メニュー" />
+      </div>
+      <nav id="nav-menu">
+        <ul style="background-image: url(images/tabmenu_backg.png)">
+          <li id="li1">
+            <!-- 服の種類選択画面に戻る -->
+            <img src="" alt="服の種類選択画面に戻る" />
+          </li>
+          <li id="li2">
+            <!-- アプリ概要 -->
+            <img src="" alt="アプリ概要" />
+          </li>
+          <li id="li3">
+            <!-- 利用規約 -->
+            <img src="" alt="利用規約" />
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <!-- 追加: オーバーレイ要素 -->
+    <div class="overlay" id="overlay"></div>
+
+    <div class="scr" id="screen1">
+      <img
+        class="text"
+        src="images/text_10.png"
+        alt="PSDファイルを選択してください"
+      />
+      <div id="FileNamediv">
+        <p id="FileName">※選択したファイル名を表示します</p>
+      </div>
+      <input type="file" id="fileInput" accept=".psd" />
+      <button onclick="document.getElementById('fileInput').click()">
+        <img src="images/uproadbtn.png" alt="ファイル選択" />
+      </button>
+
+      <button id="sendButton">
+        <img src="images/Btn.png" alt="ファイル送信" />
+      </button>
+    </div>
+    <div class="scr" id="screen2">
+      <img class="text" src="images/text_11.png" alt="パーツを分類します" />
+      <img src="images/説明画像.png" alt="見本" />
+      <img
+        class="text"
+        src="images/text_12.png"
+        alt="前面背面1つずつ、袖は2つ"
+      />
+      <button id="next">
+        <img src="images/Btn.png" alt="次へ" />
+      </button>
+    </div>
+    <div class="scr" id="screen3">
+      <div id="imageContainer"></div>
+      <!-- 画像と選択肢を表示する場所 -->
+
+      <div id="optionsContainer">
+        <!-- 画像と選択肢はJavaScriptで動的に追加 -->
+      </div>
+
+      <button id="submitButton"><img src="images/Btn.png" alt="次へ" /></button>
+    </div>
+
+    <div class="scr" id="screen4">
+      <h1>撮影する</h1>
+      <p>本来は撮影する画面　※今回はテストなのでない</p>
+      <div id="confirmationContainer"></div>
+      <!-- <canvas id="previewCanvas"></canvas> -->
+      <div id="canvasContainer"></div>
+      <!-- キャンバスを動的に追加 -->
+
+      <button id="saveButton">撮影した画像を送信する</button>
+    </div>
+
+    <script>
+      // 選択されたファイルを格納する変数
+      let selectedFile = null;
+      // 追加：キャンバスのPNG画像を保存するためのリスト
+      let savedImages = [];
+
+      const selectedFileimg = document.getElementById("selectedFileimg");
+
+      // ファイル選択時に呼ばれる関数
+      document
+        .getElementById("fileInput")
+        .addEventListener("change", function (event) {
+          selectedFile = event.target.files[0]; // 選択されたファイルを格納
+          if (selectedFile) {
+            // ファイル名を表示
+            document.getElementById(
+              "FileName"
+            ).textContent = `選択されたファイル名： ${selectedFile.name}`;
+            console.log(`選択されたファイル: ${selectedFile.name}`);
+          }
+        });
+
+      // ファイル送信ボタンが押されたときの処理
+      document
+        .getElementById("sendButton")
+        .addEventListener("click", function () {
+          if (!selectedFile) {
+            alert("ファイルが選択されていません");
+            return;
+          }
+
+          // FormDataにPSDファイルを追加
+          const formData = new FormData();
+          formData.append("file", selectedFile);
+
+          // サーバーにPOSTリクエストを送信
+          fetch(
+            "https://reindeer-real-vulture.ngrok-free.app/check_psd_template", // ngrokのURLを指定
+            // "https://sensible-trusted-hare.ngrok-free.app/check_psd_template",
+            {
+              method: "POST",
+              body: formData,
+            }
+          )
+            .then((response) => response.json()) // JSONとしてレスポンスを取得
+            .then((data) => {
+              if (data.status === "valid") {
+                alert("テンプレートは使用可能です！");
+
+                // 画像を表示
+                const imageContainer =
+                  document.getElementById("imageContainer");
+                const optionsContainer =
+                  document.getElementById("optionsContainer");
+                imageContainer.innerHTML = ""; // 前回の画像をクリア
+                optionsContainer.innerHTML = ""; // 前回の選択肢をクリア
+
+                // part_paths に基づいて画像を表示
+                data.part_paths.forEach((path, index) => {
+                  const imgContainer = document.createElement("div");
+                  imgContainer.classList.add("image-container");
+
+                  const img = document.createElement("img");
+
+                  // 画像URLをngrok経由で取得できるURLに変換
+                  const filename = path.split("/").pop(); // パスからファイル名を取り出し（例: "/tmp/tmpb1z0wtp0.png" から "tmpb1z0wtp0.png"）
+                  const imageUrl = `https://reindeer-real-vulture.ngrok-free.app/get_image/${filename}`; // サーバーのURLを使って画像を取得できるURLを作成
+
+                  img.src = `https://reindeer-real-vulture.ngrok-free.app/get_image/${filename}`; // 画像のURLを設定
+                  img.alt = `Part Image ${index + 1}`; // 代替テキスト
+
+                  // 画像をBlobとして取得
+                  fetch(imageUrl)
+                    .then((res) => res.blob()) // 画像をBlobとして取得
+                    .then((blob) => {
+                      imageBlobs.push(blob); // Blobを配列に格納
+
+                      // 画像のURLを作成して、imgタグに設定
+                      // const objectURL = URL.createObjectURL(blob);
+                      // img.src = objectURL; // 画像URLを設定
+                      // img.alt = `Part Image ${index + 1}`; // 代替テキスト
+
+                      // 画像をコンテナに追加
+                      imgContainer.prepend(img);
+
+                      // 座標情報をコンソールに表示
+                      const coordinates = data.part_info[index]; // 座標情報を取得
+                      console.log(
+                        `画像 ${index + 1} の座標情報: x=${coordinates.x}, y=${
+                          coordinates.y
+                        }, 幅=${coordinates.width}, 高さ=${coordinates.height}`
+                      );
+                    });
+                  // 対応する選択肢（前面、背面、袖、その他）を作成
+                  const options = document.createElement("div");
+                  options.classList.add("options");
+
+                  // 「前面」「背面」「袖」「その他」のラジオボタンを作成
+                  ["front", "back", "sleeve", "other"].forEach((option) => {
+                    const label = document.createElement("label");
+
+                    const input = document.createElement("input");
+                    input.type = "radio";
+                    input.name = `image${index + 1}`; // 画像ごとに異なるname属性を設定
+                    input.value = option;
+
+                    // 画像を表示
+                    const image = document.createElement("img");
+                    image.src = `images/${option.toLowerCase()}-image.png`; // 前面-image.png, 背面-image.png など
+                    image.alt = option; // 画像の代替テキスト
+                    image.style.width = "140px"; // 画像のサイズを調整
+                    image.style.height = "60px";
+                    image.classList.add(option); // クラスを追加
+
+                    // input要素を非表示
+                    // input.style.display = "none";
+
+                    label.appendChild(input);
+                    label.appendChild(image);
+
+                    // label.appendChild(document.createTextNode(option));
+                    options.appendChild(label);
+                  });
+
+                  // 選択肢をコンテナに追加
+                  imgContainer.appendChild(options);
+
+                  // 画像コンテナを表示エリアに追加
+                  imageContainer.appendChild(imgContainer);
+                });
+              } else {
+                alert("このテンプレートは使用できません");
+              }
+            })
+            .catch((error) => {
+              console.error("エラー:", error);
+              alert("エラーが発生しました。");
+            });
+          document.getElementById("screen1").style.display = "none";
+          document.getElementById("screen2").style.display = "block";
+          updateIndicator(1);
+        });
+
+      //説明を読んで次の画面へ
+      document.getElementById("next").addEventListener("click", () => {
+        document.getElementById("screen2").style.display = "none";
+        document.getElementById("screen3").style.display = "block";
+        updateIndicator(1);
+      });
+
+      // 決定ボタンが押されたときの処理
+      document
+        .getElementById("submitButton")
+        .addEventListener("click", function () {
+          const selectedValues = [];
+          const images = document.querySelectorAll(".image-container img");
+          const options = document.querySelectorAll(
+            ".image-container input[type='radio']:checked"
+          );
+
+          // チェックするために格納
+          const frontSelected = Array.from(options).filter(
+            (option) => option.value === "front"
+          ).length;
+          const backSelected = Array.from(options).filter(
+            (option) => option.value === "back"
+          ).length;
+          const sleeveSelected = Array.from(options).filter(
+            (option) => option.value === "sleeve"
+          ).length;
+          // 前面1個、背面1個、袖2個の選択チェック
+          if (
+            frontSelected < 1 ||
+            frontSelected > 1 ||
+            backSelected < 1 ||
+            backSelected > 1 ||
+            sleeveSelected < 2 ||
+            sleeveSelected > 2
+          ) {
+            console.log(frontSelected, backSelected, sleeveSelected);
+            alert("「前面1個」「背面1個」「袖2個」を適切に選択してください。");
+            return; // 進まない
+          }
+
+          // 選択された画像とオプションを記録
+          options.forEach((option, index) => {
+            const image = images[index];
+            selectedValues.push({
+              imageSrc: image.src,
+              optionValue: option.value,
+            });
+          });
+
+          // 確認画面に情報を表示
+          if (selectedValues.length > 0) {
+            document.getElementById("screen3").style.display = "none";
+            document.getElementById("screen4").style.display = "block";
+            updateIndicator(1);
+
+            const confirmationContainer = document.getElementById(
+              "confirmationContainer"
+            );
+            confirmationContainer.innerHTML = ""; // 前回の確認内容をクリア
+
+            selectedValues.forEach((item) => {
+              console.log(`選択された内容: ${item.optionValue}`);
+            });
+
+            // // キャンバスを動的に作成し、画像を描画
+            // const canvasContainer = document.getElementById("canvasContainer");
+            // // const imageBlobs = []; // 画像のBlobを格納するリスト
+            // const coordinateData = []; // 座標情報を格納するリスト
+
+            // const promises = selectedValues.map((item, index) => {
+            //   return new Promise((resolve, reject) => {
+            //     // selectedValues.forEach((item, index) => {
+            //     const canvas = document.createElement("canvas");
+            //     const ctx = canvas.getContext("2d");
+            //     const img = new Image();
+
+            //     img.crossOrigin = "Anonymous"; // CORSを許可する設定
+            //     img.src = item.imageSrc; // 画像のURLを設定
+
+            //     img.onload = function () {
+            //       // キャンバスに画像を描画
+            //       canvas.width = img.width;
+            //       canvas.height = img.height;
+            //       ctx.drawImage(img, 0, 0);
+
+            //       // 座標情報も格納
+            //       const coordinates = data.part_info[index]; // 座標情報を取得
+            //       coordinateData.push({
+            //         x: coordinates.x,
+            //         y: coordinates.y,
+            //         width: coordinates.width,
+            //         height: coordinates.height,
+            //       });
+
+            //       // キャンバスを表示
+            //       canvasContainer.appendChild(canvas);
+
+            //       // キャンバスをBlobに変換して保存
+            //       canvas.toBlob((blob) => {
+            //         imageBlobs.push(blob); // 画像のBlobを保存
+            //         console.log(blob);
+            //         resolve(); // 処理が完了したことを知らせる
+            //       }, "image/png");
+            //     };
+
+            // img.onerror = function () {
+            //   reject(
+            //     new Error(`画像の読み込みに失敗しました: ${item.imageSrc}`)
+            //   );
+            // };
+            // });
+            // });
+          }
+        });
+
+      // 保存ボタンが押されたときの処理
+      document
+        .getElementById("saveButton")
+        .addEventListener("click", function () {
+          sendImageDataToAPI2();
+        });
+
+      // 画像データと座標情報をAPIに送信する関数
+      function sendImageDataToAPI(imageBlobs, coordinateData) {
+        const formData = new FormData();
+
+        // 画像Blobをフォームデータに追加
+        imageBlobs.forEach((blob, index) => {
+          formData.append(`image${index}`, blob, `image${index}.png`);
+        });
+
+        // 座標データもフォームデータに追加
+        formData.append("coordinates", JSON.stringify(coordinateData));
+
+        // APIにPOSTリクエストを送信
+        fetch("https://reindeer-real-vulture.ngrok-free.app/process_images", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("APIからのレスポンス:", data);
+            if (data.status === "success") {
+              alert("画像が正常に送信されました！");
+            } else {
+              alert("画像の送信に失敗しました。");
+            }
+          })
+          .catch((error) => {
+            console.error("エラー:", error);
+            alert("画像の送信中にエラーが発生しました。");
+          });
+      }
+      //API関連
+      const imageBlobs = []; // 撮影した画像データを保存する配列
+      function sendImageDataToAPI2() {
+        console.log(imageBlobs); // 配列が空でないか、画像データが入っているか確認
+
+        const formData = new FormData();
+        imageBlobs.forEach((blob, index) => {
+          formData.append(`longshirt[]`, blob, `image${index}.png`);
+        });
+
+        fetch("https://reindeer-real-vulture.ngrok-free.app/process_images", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(
+                "Network response was not ok " + response.statusText
+              );
+            }
+            return response.blob();
+          })
+          .then((imageBlob) => {
+            const imageObjectURL = URL.createObjectURL(imageBlob);
+            // const imgElement = document.getElementById("resultimg");
+            const imgElements = document.querySelectorAll(".result-image"); //２つ同じClass名のimg
+            imgElements.forEach((imgElement) => {
+              imgElement.src = imageObjectURL; // 各img要素のsrcを設定
+            });
+
+            // ダウンロードリンクを設定する
+            const downloadButton = document.getElementById("download");
+            downloadButton.href = imageObjectURL;
+
+            //画像に名前をつけて、ダウンロード可能に
+            downloadButton.download = "型紙img.jpeg";
+
+            // imgElement.src = imageObjectURL;
+          })
+          .catch((error) => {
+            console.error(
+              "There has been a problem with your fetch operation:",
+              error
+            );
+          });
+      }
+
+      //ここからしたはデザイン系等
+      // インジケーター画像URLリスト
+      const IndicatorList = [
+        "images/indicator_8.png", // ファイル選択scr1
+        "images/indicator_9.png", // パーツ選択scr2,3
+      ];
+      //インジケーター
+      const indicator = document.getElementById("indicator");
+      function updateIndicator(scr) {
+        const imgSrc = IndicatorList[scr]; // 選ばれた画像のURLを取得
+        // 画像を挿入
+        const img = document.createElement("img");
+        img.src = imgSrc;
+        img.alt = `Indicator画像${scr + 1}`; // 画像の代替テキストを設定
+
+        // 既存の内容をクリアして画像を追加
+        indicator.innerHTML = ""; // 既存の内容をクリア
+        indicator.appendChild(img);
+      }
+      // 初期表示
+      updateIndicator(0);
+    </script>
+  </body>
+</html>
