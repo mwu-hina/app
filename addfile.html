@@ -301,7 +301,7 @@
 
           // サーバーにPOSTリクエストを送信
           fetch(
-            "https://reindeer-real-vulture.ngrok-free.app/check_psd_template", // ngrokのURLを指定
+            "https://bengal-adjusted-vertically.ngrok-free.app/check_psd_template", // ngrokのURLを指定
             // "https://sensible-trusted-hare.ngrok-free.app/check_psd_template",
             {
               method: "POST",
@@ -330,9 +330,9 @@
 
                   // 画像URLをngrok経由で取得できるURLに変換
                   const filename = path.split("/").pop(); // パスからファイル名を取り出し（例: "/tmp/tmpb1z0wtp0.png" から "tmpb1z0wtp0.png"）
-                  const imageUrl = `https://reindeer-real-vulture.ngrok-free.app/get_image/${filename}`; // サーバーのURLを使って画像を取得できるURLを作成
+                  const imageUrl = `https://bengal-adjusted-vertically.ngrok-free.app/get_image/${filename}`; // サーバーのURLを使って画像を取得できるURLを作成
 
-                  img.src = `https://reindeer-real-vulture.ngrok-free.app/get_image/${filename}`; // 画像のURLを設定
+                  img.src = `https://bengal-adjusted-vertically.ngrok-free.app/get_image/${filename}`; // 画像のURLを設定
                   img.alt = `Part Image ${index + 1}`; // 代替テキスト
 
                   // 画像をBlobとして取得
@@ -571,7 +571,7 @@
           formData.append(`longshirt[]`, blob, `image${index}.png`);
         });
 
-        fetch("https://reindeer-real-vulture.ngrok-free.app/process_images", {
+        fetch("https://bengal-adjusted-vertically.ngrok-free.app/process_images", {
           method: "POST",
           body: formData,
         })
